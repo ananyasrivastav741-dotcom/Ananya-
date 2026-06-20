@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GlowGuide with Ananya — Precision Skincare</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #1a0a0f;
+    --parchment: #f5e6d3;
+    --blush: #e8c5b0;
+    --rose: #c9967a;
+    --canvas: #fff9f6;
+    --muted: #8a6a5e;
+    --accent: #c9967a;
+    --bg-grad: radial-gradient(ellipse at 60% 0%, #f5d6c8 0%, #fff9f6 55%, #ede0d8 100%);
+    --transition: 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 48px;
+    background: rgba(255,249,246,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(201,150,122,0.15);
+  }
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem; font-weight: 600; letter-spacing: 0.04em;
+    color: var(--ink); text-decoration: none;
+  }
+  .nav-logo span { color: var(--rose); font-style: italic; }
+  .nav-links { display: flex; gap: 36px; list-style: none; }
+  .nav-links a {
+    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none; transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--ink); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid; place-items: center;
+    padding: 120px 24px 80px;
+    background: var(--bg-grad);
+    position: relative; overflow: hidden;
+    transition: background var(--transition);
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%23c9967a' fill-opacity='0.08'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 760px; text-align: center; position: relative; }
+  .eyebrow {
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 24px; display: block;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 300; line-height: 1.05;
+    letter-spacing: -0.01em; margin-bottom: 24px;
+  }
+  .hero h1 em { font-style: italic; color: var(--rose); }
+  .hero-sub {
+    font-size: 1rem; line-height: 1.7; color: var(--muted);
+    max-width: 480px; margin: 0 auto 56px;
+  }
+
+  /* ── SELECTOR ── */
+  .selector-wrap { position: relative; }
+  .skin-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 20px;
+  }
+  @media(max-width:600px){ .skin-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .skin-btn {
+    background: rgba(255,255,255,0.7);
+    border: 1.5px solid rgba(201,150,122,0.25);
+    border-radius: 100px;
+    padding: 14px 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem; font-weight: 400; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--muted);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    backdrop-filter: blur(6px);
+  }
+  .skin-btn .icon { font-size: 1.4rem; }
+  .skin-btn:hover, .skin-btn.active {
+    background: var(--ink); color: #fff;
+    border-color: var(--ink); transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(26,10,15,0.18);
+  }
+  .skin-btn.active { pointer-events: none; }
+
+  /* ── ADVICE CARD ── */
+  .advice-wrap {
+    max-width: 760px; margin: 0 auto; padding: 0 24px;
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    pointer-events: none;
+  }
+  .advice-wrap.visible {
+    opacity: 1; transform: translateY(0); pointer-events: auto;
+  }
+
+  .advice-card {
+    background: var(--ink); color: var(--parchment);
+    border-radius: 24px; overflow: hidden;
+    box-shadow: 0 32px 80px rgba(26,10,15,0.22);
+  }
+
+  .card-header {
+    padding: 40px 48px 32px;
+    border-bottom: 1px solid rgba(245,230,211,0.12);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 20px;
+  }
+  @media(max-width:600px){ .card-header { padding: 28px 24px; flex-direction: column; } }
+
+  .card-label {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 10px; display: block;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 300; line-height: 1.1;
+  }
+  .card-title em { font-style: italic; color: var(--blush); }
+
+  .card-badge {
+    background: rgba(201,150,122,0.2);
+    border: 1px solid rgba(201,150,122,0.35);
+    border-radius: 100px; padding: 8px 18px;
+    font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--blush); white-space: nowrap; flex-shrink: 0;
+    align-self: flex-start;
+  }
+
+  .card-body { padding: 36px 48px 40px; }
+  @media(max-width:600px){ .card-body { padding: 24px; } }
+
+  .card-intro {
+    font-size: 1.05rem; line-height: 1.75; color: rgba(245,230,211,0.8);
+    margin-bottom: 36px;
+  }
+
+  .ingredients-label {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 16px; display: block;
+  }
+  .ingredients {
+    display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 36px;
+  }
+  .ingredient-tag {
+    background: rgba(245,230,211,0.07);
+    border: 1px solid rgba(245,230,211,0.15);
+    border-radius: 100px; padding: 8px 16px;
+    font-size: 0.78rem; color: var(--blush);
+    letter-spacing: 0.04em;
+  }
+
+  .routine-steps { display: flex; flex-direction: column; gap: 0; }
+  .routine-step {
+    display: flex; align-items: flex-start; gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(245,230,211,0.08);
+  }
+  .routine-step:last-child { border-bottom: none; }
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem; font-weight: 300; color: rgba(201,150,122,0.35);
+    line-height: 1; min-width: 36px;
+  }
+  .step-content {}
+  .step-name {
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 4px;
+  }
+  .step-desc { font-size: 0.9rem; line-height: 1.6; color: rgba(245,230,211,0.65); }
+
+  /* ── FEATURES STRIP ── */
+  .features {
+    padding: 100px 24px;
+    background: var(--canvas);
+  }
+  .features-inner { max-width: 1000px; margin: 0 auto; }
+  .features-header { text-align: center; margin-bottom: 64px; }
+  .features-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 300;
+  }
+  .features-header h2 em { font-style: italic; color: var(--rose); }
+  .features-sub { color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  @media(max-width:680px){ .feat-grid { grid-template-columns: 1fr; } }
+
+  .feat-card {
+    background: white; border-radius: 20px; padding: 36px 28px;
+    border: 1px solid rgba(201,150,122,0.1);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+  }
+  .feat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 60px rgba(201,150,122,0.14);
+  }
+  .feat-icon { font-size: 2rem; margin-bottom: 20px; display: block; }
+  .feat-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem; font-weight: 400; margin-bottom: 12px;
+  }
+  .feat-card p { font-size: 0.87rem; line-height: 1.7; color: var(--muted); }
+
+  /* ── CTA ── */
+  .cta-section {
+    padding: 100px 24px;
+    background: var(--ink); text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: 'GLOW';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(8rem, 20vw, 18rem); font-weight: 300;
+    color: rgba(255,255,255,0.02); white-space: nowrap;
+    pointer-events: none; letter-spacing: -0.02em;
+  }
+  .cta-inner { position: relative; max-width: 560px; margin: 0 auto; }
+  .cta-eyebrow {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 20px; display: block;
+  }
+  .cta-section h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300;
+    color: var(--parchment); line-height: 1.1; margin-bottom: 20px;
+  }
+  .cta-section h2 em { font-style: italic; color: var(--blush); }
+  .cta-section p { color: rgba(245,230,211,0.55); font-size: 0.9rem; line-height: 1.7; margin-bottom: 40px; }
+  .cta-btn {
+    display: inline-block;
+    background: var(--rose); color: white;
+    padding: 16px 40px; border-radius: 100px;
+    font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase;
+    text-decoration: none; border: none; cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+    font-family: 'Inter', sans-serif;
+  }
+  .cta-btn:hover { background: #b8856a; transform: scale(1.04); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--ink); border-top: 1px solid rgba(245,230,211,0.06);
+    padding: 40px 48px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.3rem; color: var(--parchment); font-weight: 400;
+  }
+  .footer-logo span { color: var(--rose); font-style: italic; }
+  footer p { font-size: 0.75rem; color: rgba(245,230,211,0.3); letter-spacing: 0.06em; }
+
+  /* ── THEME TRANSITIONS ── */
+  .hero.skin-oily     { background: radial-gradient(ellipse at 65% 0%, #d4eacc 0%, #f5f8f2 55%, #e0e8db 100%); }
+  .hero.skin-dry      { background: radial-gradient(ellipse at 60% 0%, #f5d4bc 0%, #fff5ee 55%, #ead4c4 100%); }
+  .hero.skin-combination { background: radial-gradient(ellipse at 55% 0%, #d4ccf0 0%, #f5f3ff 55%, #e8d4e8 100%); }
+  .hero.skin-sensitive { background: radial-gradient(ellipse at 60% 0%, #f5d4d4 0%, #fff5f5 55%, #eacece 100%); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">Glow<span>Guide</span> <small style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);font-style:normal;font-weight:300;font-family:'Inter',sans-serif;">with Ananya</small></a>
+  <ul class="nav-links">
+    <li><a href="#advisor">Advisor</a></li>
+    <li><a href="#features">Method</a></li>
+    <li><a href="#cta">Start</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="advisor">
+  <div class="hero-inner">
+    <span class="eyebrow">Precision Skincare Advisory · with Ananya</span>
+    <h1>Your skin.<br><em>Understood.</em></h1>
+    <p class="hero-sub">Select your skin type and receive a curated routine — crafted around the ingredients your skin actually needs.</p>
+
+    <div class="selector-wrap">
+      <div class="skin-grid">
+        <button class="skin-btn" data-type="oily" onclick="selectSkin(this)">
+          <span class="icon">✦</span> Oily
+        </button>
+        <button class="skin-btn" data-type="dry" onclick="selectSkin(this)">
+          <span class="icon">◈</span> Dry
+        </button>
+        <button class="skin-btn" data-type="combination" onclick="selectSkin(this)">
+          <span class="icon">◉</span> Combination
+        </button>
+        <button class="skin-btn" data-type="sensitive" onclick="selectSkin(this)">
+          <span class="icon">❋</span> Sensitive
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADVICE CARD -->
+<div class="advice-wrap" id="adviceWrap">
+  <div class="advice-card">
+    <div class="card-header">
+      <div>
+        <span class="card-label">Your Routine</span>
+        <div class="card-title" id="cardTitle"></div>
+      </div>
+      <div class="card-badge" id="cardBadge"></div>
+    </div>
+    <div class="card-body">
+      <p class="card-intro" id="cardIntro"></p>
+      <span class="ingredients-label">Hero Ingredients</span>
+      <div class="ingredients" id="ingredientsList"></div>
+      <div class="routine-steps" id="routineSteps"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-inner">
+    <div class="features-header">
+      <h2>The <em>GlowGuide</em> method</h2>
+      <p class="features-sub">Evidence-backed. Skin-first. Ruthlessly edited.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <span class="feat-icon">⬡</span>
+        <h3>Ingredient Intelligence</h3>
+        <p>Every recommendation is built around active ingredients with clinical evidence — not trends, not marketing.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">◎</span>
+        <h3>Layered Routine Logic</h3>
+        <p>Products are sequenced by molecular weight and pH, so actives actually absorb instead of cancelling each other out.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">❖</span>
+        <h3>Zero-Compromise Results</h3>
+        <p>Less is more. A four-step routine done right beats a twelve-step cabinet of guesswork every time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-inner">
+    <span class="cta-eyebrow">Begin Your Ritual</span>
+    <h2>Skin that speaks for <em>itself.</em></h2>
+    <p>Join thousands who've traded bathroom clutter for a routine that works — built around their skin, not a trend cycle.</p>
+    <a class="cta-btn" href="#advisor">Discover Your Routine</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Glow<span>Guide</span> <small style="font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(245,230,211,0.35);font-style:normal;font-weight:300;font-family:'Inter',sans-serif;">with Ananya</small></div>
+  <p>© 2026 GlowGuide with Ananya. All rights reserved.</p>
+</footer>
+
+<script>
+  const skinData = {
+    oily: {
+      title: '<em>Balanced</em><br>Oily Skin Routine',
+      badge: 'Oily Type',
+      intro: 'Oily skin overproduces sebum — often a signal that your barrier is stripped. The goal isn\'t to dry it out; it\'s to regulate and balance, keeping pores clear without triggering more oil.',
+      ingredients: ['Niacinamide', 'Salicylic Acid (BHA)', 'Hyaluronic Acid', 'Zinc PCA', 'Green Tea Extract', 'Clay (Kaolin)'],
+      steps: [
+        { n: '01', name: 'Cleanse', desc: 'A gel or foam cleanser with salicylic acid. Twice daily — never skip the morning wash.' },
+        { n: '02', name: 'Balance', desc: 'Alcohol-free toner with niacinamide to minimize pores and regulate sebum production.' },
+        { n: '03', name: 'Treat', desc: 'Lightweight serum with niacinamide 10% + zinc 1% to calm oil glands without irritation.' },
+        { n: '04', name: 'Moisturize', desc: 'Oil-free, non-comedogenic gel moisturizer. Yes — oily skin still needs hydration.' },
+        { n: '05', name: 'Protect', desc: 'Broad-spectrum SPF 50 with a matte finish. Non-negotiable, every single day.' },
+      ],
+      themeClass: 'skin-oily'
+    },
+    dry: {
+      title: '<em>Deeply</em><br>Hydrated Dry Skin Routine',
+      badge: 'Dry Type',
+      intro: 'Dry skin lacks the lipids needed to hold water in the skin barrier. Your routine should focus on drawing in moisture, locking it in, and protecting the barrier from further depletion.',
+      ingredients: ['Ceramides', 'Hyaluronic Acid', 'Squalane', 'Glycerin', 'Shea Butter', 'Panthenol (B5)'],
+      steps: [
+        { n: '01', name: 'Cleanse', desc: 'A creamy, hydrating cleanser — never foaming. Lukewarm water only, never hot.' },
+        { n: '02', name: 'Prep', desc: 'Hydrating toner or essence packed with glycerin and panthenol, applied to damp skin.' },
+        { n: '03', name: 'Treat', desc: 'Hyaluronic acid serum layered while skin is still slightly damp to maximize absorption.' },
+        { n: '04', name: 'Seal', desc: 'A rich ceramide moisturizer to rebuild and protect the lipid barrier. More is more, here.' },
+        { n: '05', name: 'Protect', desc: 'SPF 50 with a dewy, hydrating formula — never matte, which further depletes moisture.' },
+      ],
+      themeClass: 'skin-dry'
+    },
+    combination: {
+      title: '<em>Zone-Balanced</em><br>Combination Routine',
+      badge: 'Combination Type',
+      intro: 'Combination skin has contradictory needs — an oily T-zone alongside drier cheeks. The trick is universal hydration with targeted treatment, not two separate routines.',
+      ingredients: ['Niacinamide', 'Azelaic Acid', 'Hyaluronic Acid', 'Lactic Acid (AHA)', 'Jojoba Oil', 'Centella Asiatica'],
+      steps: [
+        { n: '01', name: 'Cleanse', desc: 'A balanced, pH-correct gel cleanser that cleans without stripping any zone of the face.' },
+        { n: '02', name: 'Tone', desc: 'Niacinamide toner applied all over — it regulates oil AND soothes drier areas simultaneously.' },
+        { n: '03', name: 'Treat', desc: 'Azelaic acid serum universally applied; spot-treat the T-zone with a 2% BHA if needed.' },
+        { n: '04', name: 'Moisturize', desc: 'A medium-weight lotion — not too heavy for oily zones, not too light for dry patches.' },
+        { n: '05', name: 'Protect', desc: 'SPF 50 in a balanced formula — gel-cream textures tend to work beautifully for this type.' },
+      ],
+      themeClass: 'skin-combination'
+    },
+    sensitive: {
+      title: '<em>Calm &</em><br>Barrier-First Routine',
+      badge: 'Sensitive Type',
+      intro: 'Sensitive skin reacts easily because the barrier is compromised. The priority is to stop triggering inflammation and let your skin heal. Shorter ingredient lists are always safer than longer ones.',
+      ingredients: ['Centella Asiatica', 'Ceramides', 'Allantoin', 'Oat Extract', 'Bisabolol', 'Panthenol (B5)'],
+      steps: [
+        { n: '01', name: 'Cleanse', desc: 'Fragrance-free, dye-free micellar water or an ultra-gentle cream cleanser. Rinse once.' },
+        { n: '02', name: 'Soothe', desc: 'Centella asiatica or oat-based toner — no actives, no acids, no fragrance whatsoever.' },
+        { n: '03', name: 'Repair', desc: 'Ceramide + peptide serum to actively rebuild the barrier. Introduce one product at a time.' },
+        { n: '04', name: 'Protect', desc: 'Ceramide-rich moisturizer — a few rich, safe ingredients over a long list of unknowns.' },
+        { n: '05', name: 'SPF', desc: 'Mineral SPF (zinc oxide or titanium dioxide only) — chemical filters often irritate sensitive skin.' },
+      ],
+      themeClass: 'skin-sensitive'
+    }
+  };
+
+  function selectSkin(btn) {
+    document.querySelectorAll('.skin-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const type = btn.dataset.type;
+    const data = skinData[type];
+    const hero = document.querySelector('.hero');
+
+    // Theme the hero
+    hero.className = 'hero ' + data.themeClass;
+
+    // Populate card
+    document.getElementById('cardTitle').innerHTML = data.title;
+    document.getElementById('cardBadge').textContent = data.badge;
+    document.getElementById('cardIntro').textContent = data.intro;
+
+    const ingList = document.getElementById('ingredientsList');
+    ingList.innerHTML = data.ingredients.map(i => `<span class="ingredient-tag">${i}</span>`).join('');
+
+    const stepsList = document.getElementById('routineSteps');
+    stepsList.innerHTML = data.steps.map(s => `
+      <div class="routine-step">
+        <div class="step-num">${s.n}</div>
+        <div class="step-content">
+          <div class="step-name">${s.name}</div>
+          <div class="step-desc">${s.desc}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Reveal card
+    const wrap = document.getElementById('adviceWrap');
+    wrap.classList.add('visible');
+    setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+  }
+</script>
+</body>
+</html>
